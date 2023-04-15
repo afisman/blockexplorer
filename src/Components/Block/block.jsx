@@ -4,7 +4,9 @@ import { Link, useParams } from "react-router-dom";
 import { alchemy } from '../../Lib';
 import { Card, Container, Row } from 'react-bootstrap';
 import './block.css'
-import TableOfTransactions from '../TableOfTransactions/tableOfTransactions';
+import TableOfTransactions from '../Table/TableOfTransactions/tableOfTransactions';
+import TableOfBlocks from '../Table/TableOfTransactions/tableOfBlocks';
+import Loader from '../Loader/loader';
 
 
 const Block = () => {
@@ -13,12 +15,12 @@ const Block = () => {
     const { data: block, isLoading, error } = useQuery({
         queryKey: ['block', hash],
         queryFn: () => hash ? alchemy.core.getBlockWithTransactions(hash) : alchemy.core.getBlock(),
-        refetchInterval: !hash ? 1200 : null,
+        refetchInterval: !hash ? 360000 : null,
 
     })
 
     if (isLoading) {
-        return 'Loading...';
+        return <Loader />;
     }
 
     if (error) {
@@ -27,7 +29,7 @@ const Block = () => {
 
     const date = new Date()
 
-    console.log(block.transactions.slice(0, 20))
+    console.log(block)
     return (
         <>
             <Container className="mb-5 mt-5 mr-5 ml-5">
@@ -72,7 +74,7 @@ const Block = () => {
                     </Card.Body>
 
                 </Card>
-                <TableOfTransactions hash={block.hash} transactions={block.transactions.slice(0, 20)} />
+                <TableOfTransactions hash={block.number} transactions={block.transactions.slice(0, 10)} />
             </Container>
         </>
 

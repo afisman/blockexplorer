@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
-import TableOfTransactions from './Components/TableOfTransactions/tableOfTransactions';
+import TableOfTransactions from './Components/Table/TableOfTransactions/tableOfTransactions';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router } from 'react-router-dom';
 

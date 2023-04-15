@@ -1,4 +1,4 @@
-import { ListGroup } from "react-bootstrap"
+import { ListGroup, ListGroupItem } from "react-bootstrap"
 import { useQueries } from "@tanstack/react-query";
 import { alchemy } from '../../Lib';
 import Loader from "../Loader/loader";
@@ -11,7 +11,7 @@ const TransactionCard = (hash) => {
         data: transaction,
         isLoading,
         error,
-    }, { data: receipt, isFetched: isFetchedReceipt }] = useQueries({
+    }, { data: receipt }] = useQueries({
         queries: [
             {
                 queryKey: ['transaction', hash.hash],
@@ -23,10 +23,16 @@ const TransactionCard = (hash) => {
             }
         ]
     });
-    console.log(transaction)
+    if (isLoading) {
+        return <Loader />
+    }
+
+    if (error) {
+        return 'Error! Please try again.';
+    }
+    console.log(transaction.value.toString() / 10 ** 9)
     const wasMined = !!receipt;
 
-    console.log(receipt)
 
     // const [txDetails, setTxDetails] = useState({})
 
@@ -43,12 +49,17 @@ const TransactionCard = (hash) => {
     return <>
         {
             transaction ?
-                <ListGroup horizontal>
-                    <ListGroup.Item>{`from: ${transaction.from.slice(0, 6)}...${transaction.from.slice(38)}`}</ListGroup.Item>
-                    <ListGroup.Item>{`to: ${transaction.to.slice(0, 6)}...`}</ListGroup.Item>
-                    <ListGroup.Item>renders</ListGroup.Item>
-                    <ListGroup.Item>horizontally!</ListGroup.Item>
-                </ListGroup> :
+                <ListGroup.Item
+                    as="li"
+                    className="d-flex justify-content-between align-items-start">
+                    <div>{`${transaction.hash.slice(0, 10)}...`}</div>
+                    <div>
+                        {`from: ${transaction.from.slice(0, 6)}...`}
+                        <br />
+                        {`to: ${transaction.to.slice(0, 6)}...`}
+                    </div>
+                    <div>{(transaction.value.toString() / 10 ** 18).toFixed(4)}</div>
+                </ListGroup.Item > :
                 <Loader />
         }
     </>
