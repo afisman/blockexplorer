@@ -2,11 +2,12 @@ import { useQueries } from '@tanstack/react-query'
 import { useState, useEffect } from "react"
 import { alchemy } from '../../Lib';
 import { Link, useParams } from 'react-router-dom/cjs/react-router-dom.min';
+import { Card, Container, Row } from 'react-bootstrap';
+
 
 const Address = () => {
     const { address: defaultAddress } = useParams();
     const [address, setAddress] = useState(defaultAddress);
-    console.log(typeof defaultAddress)
 
     const [{
         data: balance,
@@ -33,12 +34,7 @@ const Address = () => {
         }]
     })
     const error = balanceError || transactionError;
-    const inflowsAndOutflows = transactions?.transfers?.filter(({ metadata: { blockTimestamp } }) => {
-        const date = new Date(blockTimestamp);
-        return date.getFullYear() === new Date().getFullYear();
-    });
 
-    console.log(transactions?.transfers)
     useEffect(() => {
         if (defaultAddress) {
             setAddress(defaultAddress);
@@ -46,47 +42,59 @@ const Address = () => {
     }, [defaultAddress])
 
     return (
-        <div className="Address">
-            <h1>Address</h1>
-            <input
-                type="text"
-                placeholder="Enter an address. e.g. 0x00000000000"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-            />
-
-            {
-                error && <p>Error! Please try again.</p>
-            }
-
-            {
-                balance && (
-                    <div>
-                        <h2>Balance</h2>
-                        <p>{parseInt(balance.toString()) / (10 ** 18)} ETH</p>
-                    </div>
-                )
-            }
-
-            {
-                inflowsAndOutflows?.length > 0 && (
-                    <div>
-                        <h2>Transactions this year ({inflowsAndOutflows.length})</h2>
-                        {
-                            transactions.slice(0, 20).map(({ metadata: { blockTimestamp }, from, value, hash }) => {
-                                const date = new Date(blockTimestamp);
-
-                                return (
-                                    <p key={hash}>
-                                        Received {value} ETH From <Link to={`/address/${from}`}>{from}</Link> on {date.toLocaleDateString()}
-                                    </p>
+        <>
+            <Container className="mb-5 mt-5 mr-5 ml-5">
+                {/* <input
+                    type="text"
+                    placeholder="Enter an address. e.g. 0x00000000000"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                /> */}
+                <Card>
+                    <Card.Body className='addressCard'>
+                        <Card.Title >
+                            <Row>
+                                Address
+                            </Row>
+                        </Card.Title>
+                        <Card.Subtitle>
+                            <Row>{address}</Row>
+                        </Card.Subtitle>
+                        <Card.Text>
+                            {
+                                balance && (
+                                    <Row>
+                                        Balance: {parseInt(balance.toString()) / (10 ** 18)} ETH
+                                    </Row>
                                 )
-                            })
+                            }
+                        </Card.Text>
+                        {
+                            transactions?.transfers && (
+                                <>
+                                    <Card.Text>Transactions this year ({transactions?.transfers?.length})</Card.Text>
+                                    <Card.Text>
+
+                                        {
+                                            transactions?.transfers?.slice(0, 20).map(({ metadata: { blockTimestamp }, from, value, hash }) => {
+                                                const date = new Date(blockTimestamp);
+
+                                                return (
+                                                    <Row key={hash}>
+                                                        Received {value} ETH From <Link to={`/address/${from}`}>{from}</Link> on {date.toLocaleDateString()}
+                                                    </Row>
+                                                )
+                                            })
+                                        }
+                                    </Card.Text>
+                                </>
+                            )
                         }
-                    </div>
-                )
-            }
-        </div>
+                    </Card.Body>
+
+                </Card>
+            </Container>
+        </>
     )
 }
 

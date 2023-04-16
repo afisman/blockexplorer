@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table'
 import TransactionCard from '../../TransactionsCard/transactionCard';
 import { useQuery } from "@tanstack/react-query";
@@ -8,8 +7,7 @@ import { Utils } from 'alchemy-sdk';
 
 
 import './tableOfTransactions.css'
-import { Col, ListGroup, Row } from 'react-bootstrap';
-import TableOfBlocks from './tableOfBlocks';
+import { ListGroup, } from 'react-bootstrap';
 import BlockCard from '../../TransactionsCard/blockCard';
 import Loader from '../../Loader/loader';
 
@@ -24,7 +22,7 @@ const TableOfTransactions = ({ hash, transactions }) => {
     const { data: blocks, isLoading, error, } = useQuery({
         queryKey: ['blocks', hash],
         queryFn: () => {
-            const block2 = Utils.hexlify(hash - 10)
+            const block2 = Utils.hexlify(hash - 9)
             const block = Utils.hexlify(hash)
             console.log(block2)
 
@@ -43,7 +41,7 @@ const TableOfTransactions = ({ hash, transactions }) => {
     }
 
     if (error) {
-        return 'Error! Please try again.';
+        return 'Error retrieving the data, please try again';
     }
 
     return <>

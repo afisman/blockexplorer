@@ -1,8 +1,8 @@
-import { Col, ListGroup } from "react-bootstrap"
-import { useEffect, useState } from 'react';
+import { ListGroup } from "react-bootstrap"
 import { alchemy } from '../../Lib';
 import Loader from "../Loader/loader";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 const BlockCard = ({ transaction }) => {
@@ -18,23 +18,25 @@ const BlockCard = ({ transaction }) => {
     }
 
     if (error) {
-        return 'Error! Please try again.';
+        return 'Error retrieving the data, please try again';
     }
 
     return <>
-        <ListGroup.Item
-            as="li"
-            className="d-flex justify-content-between align-items-start">
-            <div>{block.number}</div>
-            <div>
-                {`Fee recepient: ${block.miner.slice(0, 6)}...`}
-                <br />
-                {`${block.transactions.length} Transactions `}
-            </div>
-            <div>
-                <div>{(block.gasUsed.toString() / 10 ** 18).toFixed(6)}</div>
-            </div>
-        </ListGroup.Item >
+        {
+            block &&
+            <ListGroup.Item
+                as="li"
+                className="d-flex justify-content-between align-items-start">
+                <div><Link to={`/block/${block.hash}`}>{block.number}</Link></div>
+                <div>
+                    {`Fee recepient: ${block.miner.slice(0, 6)}...`}
+                    <br />
+                    {`${block.transactions.length} Transactions `}
+                </div>
+                <div>
+                    <div>{(block.gasUsed.toString() / 10 ** 18).toFixed(6)}</div>
+                </div>
+            </ListGroup.Item >}
 
     </>
 

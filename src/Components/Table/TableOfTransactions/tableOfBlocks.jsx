@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import Table from 'react-bootstrap/Table'
-import TransactionCard from '../../TransactionsCard/transactionCard';
+
 import { useQuery } from "@tanstack/react-query";
 import { alchemy } from '../../../Lib';
 import { Utils } from 'alchemy-sdk';
 
 
 import './tableOfTransactions.css'
-import { ListGroup, Row } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import Loader from '../../Loader/loader';
 import BlockCard from '../../TransactionsCard/blockCard';
 
@@ -38,14 +36,14 @@ const TableOfBlocks = ({ number }) => {
     }
 
     if (error) {
-        return 'Error! Please try again.';
+        return 'Error retrieving the data, please try again';
     }
     return <>
         {
             blocksArr ?
                 blocksArr?.reverse().slice(0, 10).map((transaction) => {
                     return (
-                        <ListGroup.Item><BlockCard transaction={transaction.blockHash} /></ListGroup.Item>
+                        <ListGroup.Item key={transaction.number}><BlockCard transaction={transaction.blockHash} /></ListGroup.Item>
 
                     )
                 })

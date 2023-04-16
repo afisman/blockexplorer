@@ -1,27 +1,22 @@
-import { ListGroup, ListGroupItem } from "react-bootstrap"
-import { useQueries } from "@tanstack/react-query";
+import { ListGroup } from "react-bootstrap"
+import { useQuery } from "@tanstack/react-query";
 import { alchemy } from '../../Lib';
 import Loader from "../Loader/loader";
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 
-const TransactionCard = (hash) => {
+const TransactionCard = ({ hash }) => {
 
-    const [{
+    const {
         data: transaction,
         isLoading,
         error,
-    }, { data: receipt }] = useQueries({
-        queries: [
-            {
-                queryKey: ['transaction', hash.hash],
-                queryFn: () => alchemy.core.getTransaction(hash.hash),
-            },
-            {
-                queryKey: ['receipt', hash.hash],
-                queryFn: () => alchemy.core.getTransactionReceipt(hash.hash),
-            }
-        ]
+    } = useQuery({
+
+        queryKey: ['transaction', hash],
+        queryFn: () => alchemy.core.getTransaction(hash),
+
     });
     if (isLoading) {
         return <Loader />
@@ -31,32 +26,19 @@ const TransactionCard = (hash) => {
         return 'Error! Please try again.';
     }
     console.log(transaction.value.toString() / 10 ** 9)
-    const wasMined = !!receipt;
 
-
-    // const [txDetails, setTxDetails] = useState({})
-
-    // useEffect(() => {
-    //     async function detailedTransaction() {
-    //         const tx = await alchemy.core.getTransactionReceipt(transaction.transaction)
-    //         console.log(tx)
-    //         setTxDetails(tx)
-    //     }
-    //     detailedTransaction()
-    // }, [])
-
-    // console.log(txDetails)
     return <>
         {
             transaction ?
                 <ListGroup.Item
                     as="li"
                     className="d-flex justify-content-between align-items-start">
-                    <div>{`${transaction.hash.slice(0, 10)}...`}</div>
+                    <Link to={`/transaction/${transaction.hash}`}>{`${transaction.hash.slice(0, 10)}...`}</Link>
+                    <div></div>
                     <div>
-                        {`from: ${transaction.from.slice(0, 6)}...`}
+                        from:<Link to={`/transaction/${transaction.from}`}>{` ${transaction.from.slice(0, 6)}...`}</Link>
                         <br />
-                        {`to: ${transaction.to.slice(0, 6)}...`}
+                        to: <Link to={`/transaction/${transaction.to}`}>{` ${transaction.to.slice(0, 6)}...`}</Link>
                     </div>
                     <div>{(transaction.value.toString() / 10 ** 18).toFixed(4)}</div>
                 </ListGroup.Item > :

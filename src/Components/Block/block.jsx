@@ -1,83 +1,90 @@
+import { useQueries } from '@tanstack/react-query'
 import React from 'react'
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { Container, Card, Row, ListGroup } from 'react-bootstrap'
+import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 import { alchemy } from '../../Lib';
-import { Card, Container, Row } from 'react-bootstrap';
-import './block.css'
-import TableOfTransactions from '../Table/TableOfTransactions/tableOfTransactions';
-import TableOfBlocks from '../Table/TableOfTransactions/tableOfBlocks';
 import Loader from '../Loader/loader';
+import TableOfBlocks from '../Table/TableOfTransactions/tableOfBlocks';
+import './block.css'
+
 
 
 const Block = () => {
     const { hash } = useParams()
 
-    const { data: block, isLoading, error } = useQuery({
-        queryKey: ['block', hash],
-        queryFn: () => hash ? alchemy.core.getBlockWithTransactions(hash) : alchemy.core.getBlock(),
-        refetchInterval: !hash ? 360000 : null,
+    const [{ data: block, isLoading, error },
+        { data: gasPrice }] = useQueries({
+            queries: [
+                {
+                    queryKey: ['block', hash],
+                    queryFn: () => hash ? alchemy.core.getBlockWithTransactions(hash) : alchemy.core.getBlock(),
+                },
+                {
+                    queryKey: ['gasPrice', hash],
+                    queryFn: () => alchemy.core.getGasPrice()
+                }]
 
-    })
+
+        })
+    console.log(gasPrice)
+    const date = new Date(block?.timestamp * 1000).toLocaleString()
 
     if (isLoading) {
         return <Loader />;
     }
 
     if (error) {
-        return 'Error! Please try again.';
+        return 'Error retrieving the data, please try again';
     }
-
-    const date = new Date()
-
-    console.log(block)
     return (
-        <>
-            <Container className="mb-5 mt-5 mr-5 ml-5">
-                <Card>
-                    <Card.Body className='blockCard'>
-                        <Card.Title >
-                            <Row>
-                                Block Height: {block.number}
-                            </Row>
-                        </Card.Title>
-                        <Card.Subtitle>
-                            <Row>
-                                Timestamp: {block.timestamp}
-                            </Row>
-                        </Card.Subtitle>
-                        <Card.Text>
-                            <Row>
-                                Transactions: {block.transactions.length}
-                            </Row>
-                        </Card.Text>
-                        <Card.Text>
-                            <Row>
-                                Hash: {block.hash}
-                            </Row>
-                        </Card.Text>
-                        <Card.Text>
-                            <Row>
-                                Miner: {block.miner}
-                            </Row>
-                        </Card.Text>
-                        <Card.Text>
-                            <Row>
-                                Difficulty: {block.difficulty}
-                            </Row>
-                        </Card.Text>
-                        <Card.Text>
-                            <Row>
-                                Nonce: {block.nonce}
-                            </Row>
+        <Container className='mt-5'>
+            <Card>
+                <Card.Body className='blockCard'>
+                    <Card.Title >
+                        <Row>
+                            Block Height: {block.number}
+                        </Row>
+                    </Card.Title>
+                    <Card.Subtitle>
+                        <Row>
+                            Timestamp: {date}
+                        </Row>
+                    </Card.Subtitle>
+                    <Card.Text>
+                        <Row>
+                            Transactions: {block.transactions.length}
+                        </Row>
+                    </Card.Text>
+                    <Card.Text>
+                        <Row>
+                            Hash: {block.hash}
+                        </Row>
+                    </Card.Text>
+                    <Card.Text>
+                        <Row>
+                            Miner: {block.miner}
+                        </Row>
+                    </Card.Text>
+                    <Card.Text>
+                        <Row>
+                            Gas used: {block?.gasUsed.toString() / 10 ** 9} gwei
+                        </Row>
+                    </Card.Text>
+                    <Card.Text>
+                        <Row>
+                            Gas price: {gasPrice?.toString() / 10 ** 9} gwei
+                        </Row>
 
-                        </Card.Text>
-                    </Card.Body>
+                    </Card.Text>
+                    <Card.Text>
+                        <ListGroup>
+                            <TableOfBlocks number={block.number} />
+                        </ListGroup>
+                    </Card.Text>
+                </Card.Body>
 
-                </Card>
-                <TableOfTransactions hash={block.number} transactions={block.transactions.slice(0, 10)} />
-            </Container>
-        </>
-
+            </Card>
+        </Container>
     )
 }
 
